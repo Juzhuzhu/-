@@ -1,3 +1,4 @@
+<!--
 <template>
   <div class="login clearfix">
     <div class="login-wrap">
@@ -109,5 +110,148 @@ hr {
 .el-button {
   width: 80%;
   margin-left: -50px;
+}
+</style>-->
+<template>
+  <div class="Register-box">
+    <div class="Register">
+      <el-form :model="registerForm" :rules="registerRule" ref="registerRef" label-width="100px"
+               class="demo-ruleForm registerForm">
+        <el-form-item label="用户名" prop="userName" label-width="70px">
+          <el-input v-model="registerForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="手机号" prop="userName" label-width="70px">
+          <el-input v-model="registerForm.phoneNumber"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password" label-width="70px">
+          <el-input v-model="registerForm.password" type="password" show-password></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="confirmPassword" label-width="70px">
+          <el-input v-model="registerForm.confirmPassword" type="password" show-password
+                    @keyup.enter.native="keyDown"></el-input>
+        </el-form-item>
+        <el-form-item class="btns">
+          <el-button type="primary" round @click="register">完成</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <img src="~@/assets/background.jpg" width="100%">
+  </div>
+
+</template>
+
+<script>
+export default {
+  name: "Register",
+  data() {
+    // 用户名的校验方法
+    let validateName = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("请输入用户名"));
+      }
+      // 用户名以字母开头,长度在5-16之间,允许字母数字下划线
+      const userNameRule = /^[a-zA-Z][a-zA-Z0-9_]{4,15}$/;
+      if (userNameRule.test(value)) {
+        this.$refs.registerRef.validateField("checkPass");
+        return callback();
+      } else {
+        return callback(new Error("字母开头,长度5-16之间,允许字母数字下划线"));
+      }
+    };
+    // 密码的校验方法
+    let validatePass = (rule, value, callback) => {
+      if (value === "") {
+        return callback(new Error("请输入密码"));
+      }
+      // 密码以字母开头,长度在6-18之间,允许字母数字和下划线
+      const passwordRule = /^[a-zA-Z]\w{5,17}$/;
+      if (passwordRule.test(value)) {
+        this.$refs.registerRef.validateField("checkPass");
+        return callback();
+      } else {
+        return callback(
+            new Error("字母开头,长度6-18之间,允许字母数字和下划线")
+        );
+      }
+    };
+    // 确认密码的校验方法
+    let validateConfirmPass = (rule, value, callback) => {
+      if (value === "") {
+        return callback(new Error("请输入确认密码"));
+      }
+      // 校验是否以密码一致
+      if (this.registerForm.password !== "" && value === this.registerForm.password) {
+        this.$refs.registerRef.validateField("checkPass");
+        return callback();
+      } else {
+        return callback(new Error("两次输入的密码不一致"));
+      }
+    };
+    return {
+      registerForm: {
+        name: '',
+        phoneNumber: '',
+        password: '',
+        confirmPassword: ''
+      },
+      registerRule: {
+        userName: [{validator: validateName, trigger: "blur"}],
+        password: [{validator: validatePass, trigger: "blur"}],
+        confirmPassword: [{validator: validateConfirmPass, trigger: "blur"}]
+      }
+    }
+  },
+  methods: {
+    register() {
+      this.$refs.registerRef.validate(async valid => {
+        // valid回调函数里面的Boolean值，实验的结果
+        if (!valid)//  valid为false不发起请求，valid为true时才能发出请求
+          return;
+
+        //    发起网络请求，提交数据
+        const res = await this.$http.post('/api/users/register', {
+          userName: this.registerForm.userName,
+          password: this.registerForm.password
+        })
+        console.log(res)
+        if (res.status !== 200) {
+          return this.$message.error(res.data.msg)
+        }
+        this.$message.success(res.data.msg)
+        await this.$router.push('/login')
+
+      })
+    },
+    // 点击回车键登录
+    keyDown() {
+      this.register(); //
+    },
+  },
+}
+</script>
+
+<style>
+.Register {
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 50px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+}
+
+.registerForm {
+  width: 400px;
+  padding: 20px;
+}
+
+.el-textarea__inner, .el-input__inner {
+  background: transparent !important;
+  color: white;
 }
 </style>
