@@ -120,7 +120,7 @@ hr {
         <el-form-item label="用户名" prop="userName" label-width="70px">
           <el-input v-model="registerForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="手机号" prop="userName" label-width="70px">
+        <el-form-item label="手机号" prop="phoneNumber" label-width="70px">
           <el-input v-model="registerForm.phoneNumber"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password" label-width="70px">
@@ -131,7 +131,7 @@ hr {
                     @keyup.enter.native="keyDown"></el-input>
         </el-form-item>
         <el-form-item class="btns">
-          <el-button type="primary" round @click="register">完成</el-button>
+          <el-button type="primary" round @click="register">注册</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -145,8 +145,8 @@ export default {
   name: "Register",
   data() {
     // 用户名的校验方法
-    let validateName = (rule, value, callback) => {
-      if (!value) {
+    /*let validateName = (rule, value, callback) => {
+      if (value === "") {
         return callback(new Error("请输入用户名"));
       }
       // 用户名以字母开头,长度在5-16之间,允许字母数字下划线
@@ -156,6 +156,21 @@ export default {
         return callback();
       } else {
         return callback(new Error("字母开头,长度5-16之间,允许字母数字下划线"));
+      }
+    };*/
+    // 手机号的校验方法
+    let validatePhone = (rule, value, callback) => {
+      if (value === "") {
+        return callback(new Error("请输入手机号"));
+      }
+      const phoneRule = /^[1][3-9][0-9]{9}$/;
+      if (phoneRule.test(value)) {
+        this.$refs.registerRef.validateField("checkPass");
+        return callback();
+      } else {
+        return callback(
+            new Error("请输入正确手机号")
+        );
       }
     };
     // 密码的校验方法
@@ -195,14 +210,15 @@ export default {
         confirmPassword: ''
       },
       registerRule: {
-        userName: [{validator: validateName, trigger: "blur"}],
+        // userName: [{validator: validateName, trigger: "blur"}],
+        phoneNumber: [{validator: validatePhone, trigger: "blur"}],
         password: [{validator: validatePass, trigger: "blur"}],
         confirmPassword: [{validator: validateConfirmPass, trigger: "blur"}]
       }
     }
   },
   methods: {
-    register() {
+    /*register() {
       this.$refs.registerRef.validate(async valid => {
         // valid回调函数里面的Boolean值，实验的结果
         if (!valid)//  valid为false不发起请求，valid为true时才能发出请求
@@ -220,6 +236,40 @@ export default {
         this.$message.success(res.data.msg)
         await this.$router.push('/login')
 
+      })
+    },*/
+    register() {
+      var url = "http://127.0.0.1:8081/user/register";
+      this.$axios({
+        method: "post",
+        url: url,
+        data: {
+          name: this.registerForm.name,
+          phoneNumber: this.registerForm.phoneNumber,
+          password: this.registerForm.password,
+          confirmPassword: this.registerForm.confirmPassword
+        }
+      }).then(res => {
+        //注册失败显示提示信息
+        var result = res.data;
+        if (!result.success) {
+          this.$notify.error({
+            title: '错误信息',
+            message: result.message
+          });
+          /*alert(result.message);
+          this.$router.push('/UserResgister ');*/
+        }else {
+          this.$notify({
+            title: '成功',
+            message: '注册成功，三秒后跳转至登录界面',
+            type: 'success'
+          });
+          setTimeout(function() {
+            console.log("等待了3秒钟");
+          }, 3000);
+          this.$router.push('/UserLogin');
+        }
       })
     },
     // 点击回车键登录
