@@ -1,27 +1,30 @@
-<!--
 <template>
-  <div class="login" clearfix>
-    <div class="login-wrap">
-      <el-row type="flex" justify="center">
-        <el-form ref="loginForm" :model="user" :rules="rules" status-icon label-width="80px">
-          <h3>登录</h3>
-          <hr>
-          <el-form-item prop="username" label="用户名">
-            <el-input v-model="user.username" placeholder="请输入用户名" prefix-icon></el-input>
-          </el-form-item>
-          <el-form-item id="password" prop="password" label="密码">
-            <el-input v-model="user.password" show-password placeholder="请输入密码"></el-input>
-          </el-form-item>
-          <router-link to="/">找回密码</router-link>
-          &scnap;
-          <router-link to="/userResgister">注册账号</router-link>
-          <el-form-item>
-            <el-button type="primary" icon="el-icon-upload" @click="doLogin()">登 录</el-button>
-          </el-form-item>
-        </el-form>
-      </el-row>
+  <!-- Login -->
+  <div id="login">
+
+    <h1 style="text-align: center;color: burlywood">股票型基金管理系统</h1>
+
+    <div id="login-form">
+      <h1>登陆界面</h1>
+
+      <label for="phoneNumber"><i class="el-icon-user-solid" style="color: #c1c1c1"></i></label>
+      <input type="text" placeholder="手机号码" id="phoneNumber" autocapitalize="off" v-model.trim=phoneNumber
+             aria-autocomplete="off">
+      <p style="visibility: hidden">手机号码为必填选项</p>
+      <label for="password"><i class="el-icon-lock" style="color: #c1c1c1"></i></label>
+      <input type="password" placeholder="密码" id="password" autocapitalize="off" v-model.trim="password">
+      <p style="visibility: hidden">密码为必填选项</p>
+      <div>
+        <el-button type="primary" @click="doLogin(phoneNumber, password)">登录</el-button>
+        <el-button type="info" v-on:click="resetInfo">重置</el-button>
+      </div>
+      <p class="tips" style="color: #42b983">
+        还没有帐号？<a style="color: aqua" href="/userResgister" type="primary">立即注册</a>
+      </p>
     </div>
+
   </div>
+
 </template>
 
 <script>
@@ -29,224 +32,215 @@ export default {
   name: "userLogin",
   data() {
     return {
-      user: {
-        username: "",
-        password: ""
-      }
+      phoneNumber: "",
+      password: "",
     };
   },
-  created() {},
+  created() {
+  },
+  mounted() {
+    // css transition 样式
+    let input = document.querySelectorAll("input");
+    let label = document.querySelectorAll("label")
+    let is = document.querySelectorAll("i");
+    for (let i = 0; i < input.length; i++) {
+      input[i].addEventListener("click", function () {
+        input[i].style.width = '70%';
+        input[i].style.transition = '1s';
+        label[i].style.width = '70%';
+        label[i].style.transition = '1s';
+        is[i].style.color = '#037db3';
+      })
+      input[i].addEventListener("blur", function () {
+        input[i].style.width = '60%';
+        input[i].style.transition = '1s';
+        label[i].style.width = '60%';
+        label[i].style.transition = '1s';
+        is[i].style.color = '#c1c1c1';
+      })
+    }
+  },
   methods: {
-    doLogin() {
-      if (!this.user.username) {
-        this.$message.error("请输入用户名！");
-        return;
-      } else if (!this.user.password) {
+    // 清空当前填写信息
+    resetInfo: function () {
+      this.name = "";
+      this.password = "";
+    },
+    doLogin(phoneNumber, password) {
+      if (!phoneNumber) {
+        this.$message.error("请输入手机号！");
+      }
+      if (!password) {
         this.$message.error("请输入密码！");
-        return;
-      } else {
-        //校验用户名和密码是否正确;
-        // this.$router.push({ path: "/personal" });
-        axios
-            .post("/login/", {
-              name: this.user.username,
-              password: this.user.password
-            })
-            .then(res => {
-              // console.log("输出response.data.status", res.data.status);
-              if (res.data.status === 200) {
-                this.$router.push({ path: "/personal" });
-              } else {
-                alert("您输入的用户名或密码错误！");
-              }
-            });
+      }
+      if (this.phoneNumber !== '') {
+        const phoneRule = /^1[3456789]\d{9}$/;
+        if (!phoneRule.test(this.phoneNumber)) {
+          this.$message.error("请输入有效的手机号！");
+        }
+      }
+      if (!password || password.length < 8) {
+        this.$message.error("密码长度应大于等于8位！");
+      }
+      var url = "http://127.0.0.1:8081/user/login";
+      this.$axios({
+        method: "post",
+        url: url,
+        data: {
+          phoneNumber: phoneNumber,
+          password: password
+        }
+      }).then(res => {
+        // console.log(res);
+        let result = res.data.data;
+        // console.log(result);
+        //登录失败显示提示信息
+        if (!res.data.success) {
+          this.$notify.error({
+            title: '错误信息',
+            message: result.message
+          });
+        } else {
+          // 登录后将用户信息设置在localStorage中，需要用时通过getItem(key)方法获取
+          localStorage.setItem("token", result.token);
+          localStorage.setItem("headImgUrl", result.headImgUrl);
+          localStorage.setItem("id", result.id);
+          localStorage.setItem("name", result.name);
+          // var i = localStorage.getItem("token");
+          // console.log("token:" + i);
+          this.$notify({
+            title: '成功',
+            message: '登录成功，跳转至主界面',
+            type: 'success'
+          });
+          setTimeout(function () {
+            console.log("等待了5秒钟");
+          }, 5000);
+          this.$router.push('/fundList');
+        }
+      })
+    }
+  },
+  watch: {
+    // 动态监测,验证 input 中 值的输入
+    phoneNumber: function checkPhoneNumber() {
+      let p = document.querySelectorAll("p");
+      if (this.phoneNumber.length < 1) {
+        p[0].innerHTML = "用户名称应大于 1 ";
+      }
+      if (this.phoneNumber.length >= 1) {
+        p[0].style.visibility = "hidden";
+      }
+      if (this.phoneNumber.length === 0) {
+        p[0].style.visibility = "visible";
+      }
+    }
+    ,
+    password: function checkPassword() {
+      let p = document.querySelectorAll("p");
+      if (this.password.length < 8) {
+        p[1].style.visibility = "visible";
+        p[1].innerHTML = "用户密码应大于 8 ";
+      }
+      if (this.password.length >= 8) {
+        p[1].style.visibility = "hidden";
+      }
+      if (this.password.length === 0) {
+        p[1].innerHTML = "请重新输入密码";
+        p[1].style.visibility = "visible";
       }
     }
   }
-
+  ,
 
 }
 </script>
 
-<style scoped>
-
-.login {
-  width: 100%;
-  height: 740px;
-  background: url("~@/assets/bg1.jpg") no-repeat;
-  background-size: cover;
+<style lang="less" scoped>
+#login {
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
-}
-.login-wrap {
-  background: url("~@/assets/bg1.jpg") no-repeat;
+  position: relative;
+  // 背景图片样式
+  background-image: url("~@/assets/background.jpg");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
   background-size: cover;
-  width: 400px;
-  height: 300px;
-  margin: 215px auto;
-  /*overflow: hidden;*/
-  padding-top: 10px;
-  line-height: 40px;
 }
-#password {
-  margin-bottom: 5px;
-}
-h3 {
-  color: #0babeab8;
-  font-size: 24px;
-}
-hr {
-  background-color: #444;
-  margin: 20px auto;
-}
-a {
-  text-decoration: none;
-  color: #aaa;
-  font-size: 15px;
-}
-a:hover {
-  color: coral;
-}
-.el-button {
-  width: 80%;
-  margin-left: -50px;
-}
-</style>-->
-<template>
-  <div class="Login">
-    <div class="login-box">
-      <el-form :model="loginForm" :rules="loginRule" ref="loginRef"  label-width="100px" class="demo-ruleForm loginForm">
-        <el-form-item label="账号" prop="userName" label-width="60px">
-          <el-input v-model="loginForm.userName" clearable></el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password" label-width="60px">
-          <el-input v-model="loginForm.password"  type="password" show-password @keyup.enter.native="keyDown"></el-input>
-        </el-form-item>
-        <el-form-item class="btns">
-          <el-button type="primary" round @click="login">登录</el-button>
-          <el-button type="primary" round @click="register">
-            <router-link to="/userResgister">注册</router-link>
-          </el-button>
-        </el-form-item>
-      </el-form>
-    </div>
-    <img src="~@/assets/background.jpg" width="100%">
-  </div>
-</template>
 
-<script>
-import { mapActions } from "vuex";
-export default {
-  name: "Login",
-  data(){
-    // 用户名的校验方法
-    let validateName = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error("请输入用户名"));
-      }
-      // 用户名以字母开头,长度在5-16之间,允许字母数字下划线
-      const userNameRule = /^[a-zA-Z][a-zA-Z0-9_]{4,15}$/;
-      if (userNameRule.test(value)) {
-        this.$refs.loginRef.validateField("checkPass");
-        return callback();
-      } else {
-        return callback(new Error("字母开头,长度5-16之间,允许字母数字下划线"));
-      }
-    };
-    // 密码的校验方法
-    let validatePass = (rule, value, callback) => {
-      if (value === "") {
-        return callback(new Error("请输入密码"));
-      }
-      // 密码以字母开头,长度在6-18之间,允许字母数字和下划线
-      const passwordRule = /^[a-zA-Z]\w{5,17}$/;
-      if (passwordRule.test(value)) {
-        this.$refs.loginRef.validateField("checkPass");
-        return callback();
-      } else {
-        return callback(
-            new Error("字母开头,长度6-18之间,允许字母数字和下划线")
-        );
-      }
-    };
-    return{
-      loginForm:{
-        userName:'',
-        password:''
-      },
-      loginRule:{
-        userName:[{ validator: validateName, trigger: "blur" }],
-        password: [{ validator: validatePass, trigger: "blur" }]
-      }
-
-    }
-  },
-  methods:{
-    ...mapActions(['setUser']),
-    login(){
-      // 对整个表单进行校验的方法，参数为一个回调函数。该回调函数会在校验结束后被调用，
-      // 并传入两个参数：是否校验成功和未通过校验的字段。若不传入回调函数，则会返回一个 promise
-      this.$refs.loginRef.validate(async valid=> {
-        // valid回调函数里面的Boolean值，实验的结果
-        if (!valid)//  valid为false不发起请求，valid为true时才能发出请求
-          return;
-
-        //    发起网络请求，提交数据
-        const res = await this.$http.post('/api//users/login',this.loginForm)
-        // console.log(res)
-        if(res.status !== 200){
-          return this.$message.error(res.data.msg)
-        }
-        this.$message.success(res.data.msg)
-        //  1.将登录成功之后token，保存到客户端的sessionStorage中
-        //  1.1 项目中除了登录页面之外的其他API接口，必须在登录之后才能访问
-        // 1.2 token只应在当前网站打开期间生效，所以将token 保存在sessionStorage 中
-        // window.sessionStorage.setItem("token",res.data.token);
-        // 登录信息存到本地
-        let user = JSON.stringify(res.data.user);
-        localStorage.setItem("user", user);
-
-        //提交到Vuex中的setUser方法中保存用户状态
-        this.setUser(res.data.user)
-        await this.$router.push({path:'/homeMain',query:{userName:this.loginForm.userName}})
-        // this.login(); // 定义的登录方法
-      })
-    },
-    register(){
-      this.$router.push('/register')
-    },
-    // 点击回车键登录
-    keyDown() {
-      // 回车则执行登录方法 enter键的ASCII是13
-      // if (e.keyCode === 13) {
-      this.login(); // 定义的登录方法
-      // }
-    },
-
-  },
-}
-</script>
-
-<style>
-.Login .login-box{
-  /*background-color:#2B2B2B;*/
-  background:rgba(0,0,0,0.3);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  padding: 50px;
+#login-form {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  width: 50vw;
+  min-width: 300px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 15px;
+  // 表单 box-shadow 样式 好看
+  box-shadow: 0 15px 25px rgba(0, 0, 0, .5);
+
+  h1 {
+    width: 60%;
+    margin: 50px auto 0;
+    color: #c1c1c1;
+    text-align: center;
+  }
+
+  input {
+    width: 60%;
+    margin: 0 auto;
+    // 注意 border outline 默认值
+    outline: none;
+    border: none;
+    padding: 10px;
+    border-bottom: 1px solid #fff;
+    background: transparent;
+    color: white;
+  }
+
+  label {
+    width: 60%;
+    margin: 0 auto;
+    position: relative;
+    top: 30px;
+    left: -156px;
+  }
+
+  div {
+    width: 60%;
+    margin: 10px auto;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+  }
+
+  button {
+    // rgba
+    background-color: rgba(9, 108, 144, 0.5);
+    margin: 10px 25px 40px 25px;
+  }
+
+  p {
+    width: 60%;
+    margin: 8px auto;
+    position: relative;
+    left: -15px;
+    color: #ff0000;
+    font-size: 8px;
+  }
 }
-.loginForm{
-  width: 400px;
-  padding: 20px;
+
+// 浏览器兼容 , 针对谷歌浏览器 默认设置的 奇怪样式
+input {
+  -webkit-text-fill-color: #ffffff !important;
+  transition: background-color 5000s ease-in-out, width 1s ease-out !important;
 }
-.el-textarea__inner,.el-input__inner{
-  background: transparent !important;
-  color: white;
-}
+
 
 </style>

@@ -77,6 +77,8 @@ export default {
         url: url,
         data: {pageNumber: pageNum, pageSize: pageSize, fundCode: fundCode, fundName: fundName}
       }).then(res => {
+        // var i = localStorage.getItem("token");
+        // console.log("token:" + i);
         //获取表格数据
         this.tableData = res.data.data.records;
         //获取页码数据
