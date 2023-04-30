@@ -61,7 +61,7 @@ export default {
       tableData: [],
       pageInfo: {
         pageNumber: 1,
-        pageSize: 5,
+        pageSize: 7,
         total: 0,
         fundCode: null,
         fundName: null,

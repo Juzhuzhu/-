@@ -21,7 +21,12 @@ const routes = [
                 path: "/fundHistory",
                 name: "fundHistory",
                 component: () => import("@/views/pages/FundHistory.vue"),
-            }
+            },
+            {
+                path: "/userInfo",
+                name: "userInfo",
+                component: () => import("@/views/pages/UserInfo.vue")
+            },
         ]
     },
     {
