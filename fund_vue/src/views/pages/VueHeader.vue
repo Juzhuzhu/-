@@ -1,7 +1,7 @@
 <template>
   <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
     <el-menu-item index="1"  v-on:click="toFundList()">主页</el-menu-item>
-    <!--    v-if 返回false显示，返回true隐藏-->
+    <!--    v-if 返回false隐藏，返回true显示-->
     <el-menu-item index="2" v-if="!checkLogin()">
       <router-link to="/userResgister">注册</router-link>
     </el-menu-item>
@@ -12,8 +12,8 @@
     <el-submenu index="5" v-if="checkLogin()">
       <template slot="title">用户中心</template>
       <el-menu-item index="5-1" v-on:click="toUserInfo()">个人信息</el-menu-item>
-      <el-menu-item index="5-2" v-on:click="logout()">持有基金</el-menu-item>
-      <el-menu-item index="5-3" v-on:click="logout()">交易记录</el-menu-item>
+      <el-menu-item index="5-2" v-on:click="toFundOwn()">持有基金</el-menu-item>
+      <el-menu-item index="5-3" v-on:click="toRecord()">交易记录</el-menu-item>
       <!--      <el-submenu index="5-4">
               <template slot="title">选项4</template>
               <el-menu-item index="5-4-1">选项1</el-menu-item>
@@ -81,9 +81,18 @@ export default {
         }
       });
     },
+    //回到主页
     toFundList() {
       this.$router.push("/fundList");
     },
+    //前往查看用户个人持有基金
+    toFundOwn() {
+      this.$router.push("/fundOwn");
+    },
+    //前往查看个人交易记录
+    toRecord() {
+      this.$router.push("/fundTransactionRecord");
+    }
   },
 }
 

@@ -30,7 +30,7 @@
           <el-button @click="handleClick(scope.row)" type="text" size="small">
             查看
           </el-button>
-          <el-button type="text" size="small">购买</el-button>
+          <el-button type="text" size="small" @click="open(scope.row)">购买</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -85,9 +85,9 @@ export default {
         this.pageInfo.pageNumber = res.data.data.current;
         this.pageInfo.pageSize = res.data.data.size;
         this.pageInfo.total = res.data.data.total;
-        console.log("当前第" + this.pageInfo.pageNumber + "页，当前页有" + this.pageInfo.pageSize + "条数据，共" + this.pageInfo.total + "条")
-        console.log(res);
-        console.log(this.tableData);
+        // console.log("当前第" + this.pageInfo.pageNumber + "页，当前页有" + this.pageInfo.pageSize + "条数据，共" + this.pageInfo.total + "条")
+        // console.log(res);
+        // console.log(this.tableData);
       })
     },
     // 查询基金历史净值
@@ -99,6 +99,40 @@ export default {
         query: {
           fundCode: row.fundCode,
           fundName: row.fundName,
+        }
+      })
+    },
+    // 打开需要购买金额的弹窗
+    open(row) {
+      this.$prompt('请输入购买金额', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputPattern: /^([0-9]+|[0-9]{1,3}(,[0-9]{3})*)(\.[0-9]{2})?$/,
+        inputErrorMessage: '输入金额格式不正确'
+      }).then(({value}) => {
+        // 点击确定进行的操作
+        this.fundPurchase(row, value);
+      }).catch(() => {
+        // 点击取消进行的操作
+      });
+    },
+    //购买对应基金函数
+    fundPurchase(row, purchaseAmount) {
+      const url = "http://127.0.0.1:8081/fund/purchase";
+      const token = localStorage.getItem("token");
+      this.$axios({
+        method: "post",
+        url: url,
+        headers: {token: token},
+        data: {fundId: row.id, fundDate: row.fundDate, purchaseAmount: purchaseAmount}
+      }).then(res => {
+        if (res.data.success) {
+          this.$message({
+            message: '购买成功',
+            type: 'success'
+          });
+        } else {
+          this.$message.error(res.data.message);
         }
       })
     },

@@ -59,7 +59,7 @@ export default {
   methods: {
     //查询历史净值
     getFundHistory(fundCode, pageNumber, pageSize) {
-      var url = "http://127.0.0.1:8081/fund/history";
+      const url = "http://127.0.0.1:8081/fund/history";
       this.$axios({
         method: "post",
         url: url,

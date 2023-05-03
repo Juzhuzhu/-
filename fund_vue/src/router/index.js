@@ -27,6 +27,16 @@ const routes = [
                 name: "userInfo",
                 component: () => import("@/views/pages/UserInfo.vue")
             },
+            {
+                path: "/fundOwn",
+                name: "fundOwn",
+                component: () => import("@/views/pages/FundOwn.vue")
+            },
+            {
+                path: "/fundTransactionRecord",
+                name: "fundTransactionRecord",
+                component: () => import("@/views/pages/FundTransactionRecord.vue")
+            },
         ]
     },
     {
