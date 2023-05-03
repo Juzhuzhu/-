@@ -67,6 +67,7 @@ export default {
         message: '用户已注销',
         type: 'success'
       });
+      this.toFundList();
     },
     //头像加载失败fallback行为
     errorHandler() {
