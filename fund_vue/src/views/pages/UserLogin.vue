@@ -98,7 +98,7 @@ export default {
         if (!res.data.success) {
           this.$notify.error({
             title: '错误信息',
-            message: result.message
+            message: res.data.message
           });
         } else {
           // 登录后将用户信息设置在localStorage中，需要用时通过getItem(key)方法获取

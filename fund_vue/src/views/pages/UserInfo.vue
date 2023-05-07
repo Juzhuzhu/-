@@ -55,7 +55,11 @@ export default {
           this.phoneNumber = resultData.phoneNumber;
           this.utcCreate = resultData.utcCreate;
           this.headImgUrl = resultData.headImgUrl;
-          this.amount = resultData.amount;
+          if (resultData.amount===null) {
+            this.amount = 0;
+          }else {
+            this.amount = resultData.amount;
+          }
           if (resultData.userStateEnum === "NORMAL") {
             this.userStateEnum = "正常用户";
           } else {
@@ -76,14 +80,14 @@ export default {
         cancelButtonText: '取消',
         inputPattern: /^([0-9]+|[0-9]{1,3}(,[0-9]{3})*)(\.[0-9]{2})?$/,
         inputErrorMessage: '输入金额格式不正确'
-      }).then(({ value }) => {
-        //调用购买的函数
-
-        //todo 充值函数尚未实现
+      }).then(({value}) => {
+        //调用充值的函数
+        this.recharge(value);
         this.$message({
           type: 'success',
           message: '充值金额是: ' + value
         });
+
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -91,6 +95,32 @@ export default {
         });
       });
     },
+    //充值函数
+    recharge(rechargeNum) {
+      const url = "http://127.0.0.1:8081/user/recharge";
+      const token = localStorage.getItem("token");
+      this.$axios({
+        method: "post",
+        url: url,
+        async: false,
+        headers: {
+          token: token,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data: {rechargeNum: rechargeNum}
+      }).then(res => {
+        if (res.data.success) {
+          this.$message({
+            message: '充值成功',
+            type: 'success'
+          });
+        } else {
+          this.$message.error(res.data.message);
+        }
+        //充值完毕重新查询个人信息
+        this.getUserInfo();
+      })
+    }
   }
 }
 </script>

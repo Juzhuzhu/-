@@ -6,19 +6,19 @@
       <el-row :gutter="20">
         <el-col :span="6">
           <div>
-            <el-statistic group-separator="," :precision="2" :value="value2" title="持有数"></el-statistic>
+            <el-statistic group-separator="," :value="ownNum" title="持有数"></el-statistic>
           </div>
         </el-col>
         <el-col :span="6">
           <div>
-            <el-statistic title="盈亏比">
-              <template slot="formatter"> 456/2</template>
+            <el-statistic title="基金持仓比例">
+              <template slot="formatter"> {{ ratio }}</template>
             </el-statistic>
           </div>
         </el-col>
         <el-col :span="6">
           <div>
-            <el-statistic group-separator="," :precision="2" decimal-separator="." :value="value1" title="利润">
+            <el-statistic group-separator="," :precision="2" decimal-separator="." :value="profit" title="利润">
               <template slot="prefix">
                 <i class="el-icon-s-flag" style="color: red"></i>
               </template>
@@ -84,9 +84,9 @@ export default {
       },
 
       like: true,
-      value1: 4154.564,
-      value2: 2222,
-      title: '今年的增长',
+      ownNum: '',
+      ratio: '',
+      profit: '',
     }
   },
   methods: {
@@ -100,13 +100,18 @@ export default {
         headers: {token: token},
         data: {pageNumber: pageNumber, pageSize: pageSize}
       }).then(res => {
-        // console.log("持有信息：" + res);
+        console.log(res);
+        const result = res.data.data;
         //获取表格数据
-        this.tableData = res.data.data.records;
+        this.tableData = result.fundOwnRespIpage.records;
         //获取页码数据
-        this.pageInfo.pageNumber = res.data.data.current;
-        this.pageInfo.pageSize = res.data.data.size;
-        this.pageInfo.total = res.data.data.total;
+        this.pageInfo.pageNumber = result.fundOwnRespIpage.current;
+        this.pageInfo.pageSize = result.fundOwnRespIpage.size;
+        this.pageInfo.total = result.fundOwnRespIpage.total;
+        //页面上部数据总结赋值
+        this.ownNum = result.ownNum;
+        this.ratio = result.ratio;
+        this.profit = result.profit;
       })
     },
     //弹出框框校验
