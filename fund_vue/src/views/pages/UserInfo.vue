@@ -60,11 +60,12 @@ export default {
           }else {
             this.amount = resultData.amount;
           }
-          if (resultData.userStateEnum === "NORMAL") {
-            this.userStateEnum = "正常用户";
-          } else {
-            this.userStateEnum = "禁用用户";
-          }
+          this.userStateEnum = resultData.userStateEnum;
+          // if (resultData.userStateEnum === "NORMAL") {
+          //   this.userStateEnum = "正常用户";
+          // } else {
+          //   this.userStateEnum = "禁用用户";
+          // }
         } else {
           this.$notify.error({
             title: '错误信息',
