@@ -12,7 +12,7 @@
              aria-autocomplete="off">
       <p style="visibility: hidden">手机号码为必填选项</p>
       <label for="password"><i class="el-icon-lock" style="color: #c1c1c1"></i></label>
-      <input type="password" placeholder="密码" id="password" autocapitalize="off" v-model.trim="password">
+      <input type="password" placeholder="密码" id="password" autocapitalize="off" v-model.trim="password" v-on:keyup.enter="doLogin(phoneNumber, password)">
       <p style="visibility: hidden">密码为必填选项</p>
       <div>
         <el-button type="primary" @click="doLogin(phoneNumber, password)">登录</el-button>
