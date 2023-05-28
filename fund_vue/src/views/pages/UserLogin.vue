@@ -2,10 +2,10 @@
   <!-- Login -->
   <div id="login">
 
-    <h1 style="text-align: center;color: burlywood">股票型基金管理系统</h1>
+    <h1 style="text-align: center;color: rgba(100, 100, 1000, 1)">股票型基金管理系统</h1>
 
     <div id="login-form">
-      <h1>登陆界面</h1>
+      <h1>LOGIN</h1>
 
       <label for="phoneNumber"><i class="el-icon-user-solid" style="color: #c1c1c1"></i></label>
       <input type="text" placeholder="手机号码" id="phoneNumber" autocapitalize="off" v-model.trim=phoneNumber
@@ -14,13 +14,13 @@
       <label for="password"><i class="el-icon-lock" style="color: #c1c1c1"></i></label>
       <input type="password" placeholder="密码" id="password" autocapitalize="off" v-model.trim="password" v-on:keyup.enter="doLogin(phoneNumber, password)">
       <p style="visibility: hidden">密码为必填选项</p>
+      <p class="tips" style="color: #e5e9f2">
+        还没有帐号？<a style="color: mediumvioletred" href="/userResgister" type="primary">立即注册</a>
+      </p>
       <div>
         <el-button type="primary" @click="doLogin(phoneNumber, password)">登录</el-button>
         <el-button type="info" v-on:click="resetInfo">重置</el-button>
       </div>
-      <p class="tips" style="color: #42b983">
-        还没有帐号？<a style="color: aqua" href="/userResgister" type="primary">立即注册</a>
-      </p>
     </div>
 
   </div>
@@ -181,7 +181,7 @@ export default {
   display: flex;
   flex-direction: column;
   background-color: rgba(0, 0, 0, 0.7);
-  border-radius: 15px;
+  border-radius: 90px;
   // 表单 box-shadow 样式 好看
   box-shadow: 0 15px 25px rgba(0, 0, 0, .5);
 
@@ -222,7 +222,7 @@ export default {
 
   button {
     // rgba
-    background-color: rgba(9, 108, 144, 0.5);
+    background-color: rgba(100, 100, 1000, 1);
     margin: 10px 25px 40px 25px;
   }
 

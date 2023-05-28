@@ -1,11 +1,11 @@
 <template>
   <div id="login">
 
-    <h1 style="text-align: center;color:lightseagreen">股票型基金管理系统</h1>
+    <h1 style="text-align: center;color:rgba(100, 100, 1000, 1)">股票型基金管理系统</h1>
 
     <div id="login-form">
 
-      <h1>注册页面</h1>
+      <h1>REGISTER</h1>
 
       <label for="name"><i class="el-icon-price-tag" style="color: #c1c1c1"></i></label>
       <input type="text" placeholder="用户名" id="name" autocapitalize="off" v-model.trim=name
@@ -25,14 +25,13 @@
       <input type="password" placeholder="确认密码" id="confirmPassword" autocapitalize="off"
              v-model.trim="confirmPassword">
       <p style="visibility: hidden">确认密码为必填选项</p>
-
+      <p class="tips" style="color: #e5e9f2">
+        已注册-><a style="color: mediumvioletred" href="/userLogin" type="warning">登录</a>
+      </p>
       <div>
         <el-button type="primary" @click="doRegister(phoneNumber, name, password, confirmPassword)">注册</el-button>
         <el-button type="info" v-on:click="resetInfo">重置</el-button>
       </div>
-      <p class="tips" style="color: #42b983">
-        已有账号？<a style="color: aqua" href="/userLogin" type="warning">去登录</a>
-      </p>
     </div>
   </div>
 </template>
@@ -199,7 +198,7 @@ export default {
   display: flex;
   flex-direction: column;
   background-color: rgba(0, 0, 0, 0.7);
-  border-radius: 15px;
+  border-radius: 90px;
   // 表单 box-shadow 样式 好看
   box-shadow: 0 15px 25px rgba(0, 0, 0, .5);
 
@@ -240,7 +239,7 @@ export default {
 
   button {
     // rgba
-    background-color: rgba(9, 108, 144, 0.5);
+    background-color: rgba(100, 100, 1000, 1);
     margin: 10px 25px 40px 25px;
   }
 
